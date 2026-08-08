@@ -6,9 +6,6 @@ const { useState, useEffect, useRef } = React;
 
 function App() {
     // 1. React States
-    const [theme, setTheme] = useState(() => {
-        return localStorage.getItem('portfolio-theme') || 'dark';
-    });
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState('all');
     const [selectedProject, setSelectedProject] = useState(null);
@@ -33,26 +30,14 @@ function App() {
     const [formSubmitting, setFormSubmitting] = useState(false);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
-    // 2. Theme Toggle Effect
+    // Clean up any remaining light mode class on mount
     useEffect(() => {
-        if (theme === 'light') {
-            document.body.classList.add('light-mode');
-            document.body.style.backgroundColor = '#f8fafc';
-            document.body.style.color = '#0f172a';
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('portfolio-theme', 'light');
-        } else {
-            document.body.classList.remove('light-mode');
-            document.body.style.backgroundColor = '#0b0f19';
-            document.body.style.color = '#f1f5f9';
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('portfolio-theme', 'dark');
-        }
-    }, [theme]);
-
-    const toggleTheme = () => {
-        setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
-    };
+        document.body.classList.remove('light-mode');
+        document.documentElement.classList.add('dark');
+        document.body.style.backgroundColor = '#0b0f19';
+        document.body.style.color = '#f1f5f9';
+        localStorage.removeItem('portfolio-theme');
+    }, []);
 
     // 3. Scroll Listener Effect
     useEffect(() => {
@@ -223,15 +208,6 @@ function App() {
                     <div className="hidden md:flex items-center gap-3">
                         <button
                             type="button"
-                            onClick={toggleTheme}
-                            className="w-10 h-10 rounded-xl bg-slate-900/90 border border-slate-800 text-amber-400 hover:text-amber-300 flex items-center justify-center transition-all shadow-md hover:scale-105 cursor-pointer relative z-50"
-                            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-                        >
-                            <i className={`fa-solid ${theme === 'dark' ? 'fa-sun text-amber-400' : 'fa-moon text-indigo-600'} text-lg`} />
-                        </button>
-
-                        <button
-                            type="button"
                             onClick={() => { setCvModalOpen(true); document.body.style.overflow = 'hidden'; }}
                             className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 text-xs font-bold transition-all shadow-lg shadow-cyan-500/20 flex items-center gap-2 cursor-pointer"
                         >
@@ -262,15 +238,7 @@ function App() {
                                 {sec === 'experience' ? 'Timeline' : sec}
                             </a>
                         ))}
-                        <div className="pt-2 border-t border-slate-800 space-y-2">
-                            <button
-                                type="button"
-                                onClick={toggleTheme}
-                                className="w-full py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer"
-                            >
-                                <i className={`fa-solid ${theme === 'dark' ? 'fa-sun text-amber-400' : 'fa-moon text-indigo-600'}`} />
-                                <span>Switch to {theme === 'dark' ? 'Light' : 'Dark'} Mode</span>
-                            </button>
+                        <div className="pt-2 border-t border-slate-800">
                             <button
                                 type="button"
                                 onClick={() => { setMobileMenuOpen(false); setCvModalOpen(true); document.body.style.overflow = 'hidden'; }}

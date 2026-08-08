@@ -93,16 +93,12 @@ class ParticleNetwork {
                 }
             }
 
-            const isLight = document.body && document.body.classList.contains('light-mode');
-            const particleColor = isLight ? 'rgba(14, 116, 144, ' : p.color;
-            const lineColor = isLight ? 'rgba(2, 132, 199, ' : 'rgba(56, 189, 248, ';
-
             // Draw particle point
             this.ctx.beginPath();
             this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            this.ctx.fillStyle = particleColor + p.alpha + ')';
-            this.ctx.shadowBlur = isLight ? 4 : 10;
-            this.ctx.shadowColor = isLight ? 'rgba(2, 132, 199, 0.3)' : 'rgba(6, 182, 212, 0.5)';
+            this.ctx.fillStyle = p.color + p.alpha + ')';
+            this.ctx.shadowBlur = 10;
+            this.ctx.shadowColor = 'rgba(6, 182, 212, 0.5)';
             this.ctx.fill();
 
             // Connect nearby particles with glowing line
@@ -113,11 +109,11 @@ class ParticleNetwork {
                 let dist = Math.sqrt(dx * dx + dy * dy);
 
                 if (dist < this.maxDistance) {
-                    let alpha = (1 - dist / this.maxDistance) * (isLight ? 0.2 : 0.25);
+                    let alpha = (1 - dist / this.maxDistance) * 0.25;
                     this.ctx.beginPath();
                     this.ctx.moveTo(p.x, p.y);
                     this.ctx.lineTo(p2.x, p2.y);
-                    this.ctx.strokeStyle = `${lineColor}${alpha})`;
+                    this.ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
                     this.ctx.lineWidth = 0.8;
                     this.ctx.stroke();
                 }

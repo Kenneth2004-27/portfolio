@@ -3,7 +3,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
     initPreloader();
     initCustomCursor();
     initTypingEffect();
@@ -19,65 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initModals();
     initDynamicYear();
 });
-
-/* 0. Theme Toggle Handler (Dark / Light Mode) */
-function initTheme() {
-    const btnDesktop = document.getElementById('theme-toggle-btn');
-    const btnMobile = document.getElementById('mobile-theme-toggle-btn');
-
-    if (btnDesktop) {
-        btnDesktop.addEventListener('click', (e) => {
-            e.preventDefault();
-            toggleTheme();
-        });
-    }
-
-    if (btnMobile) {
-        btnMobile.addEventListener('click', (e) => {
-            e.preventDefault();
-            toggleTheme();
-        });
-    }
-
-    const savedTheme = localStorage.getItem('portfolio-theme');
-    if (savedTheme === 'light') {
-        setTheme('light');
-    } else {
-        setTheme('dark');
-    }
-}
-
-function toggleTheme() {
-    const isLight = document.body.classList.contains('light-mode') || !document.documentElement.classList.contains('dark');
-    const newTheme = isLight ? 'dark' : 'light';
-    setTheme(newTheme);
-}
-
-window.toggleTheme = toggleTheme;
-
-function setTheme(theme) {
-    const desktopIcon = document.getElementById('theme-toggle-icon');
-    const mobileIcon = document.getElementById('mobile-theme-icon');
-    const mobileText = document.getElementById('mobile-theme-text');
-
-    if (theme === 'light') {
-        document.body.classList.add('light-mode');
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('portfolio-theme', 'light');
-
-        if (desktopIcon) desktopIcon.className = 'fa-solid fa-moon text-lg text-indigo-600 pointer-events-none';
-        if (mobileIcon) mobileIcon.className = 'fa-solid fa-moon text-indigo-600 pointer-events-none';
-        if (mobileText) mobileText.textContent = 'Switch to Dark Mode';
-    } else {
-        document.body.classList.remove('light-mode');
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('portfolio-theme', 'dark');
-
-        if (desktopIcon) desktopIcon.className = 'fa-solid fa-sun text-lg text-amber-400 pointer-events-none';
-        if (mobileIcon) mobileIcon.className = 'fa-solid fa-sun text-amber-400 pointer-events-none';
-        if (mobileText) mobileText.textContent = 'Switch to Light Mode';
-    }
-}
 
 /* 1. Preloader Handler */
 function initPreloader() {
