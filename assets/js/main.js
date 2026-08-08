@@ -3,6 +3,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     initPreloader();
     initCustomCursor();
     initTypingEffect();
@@ -18,6 +19,65 @@ document.addEventListener('DOMContentLoaded', () => {
     initModals();
     initDynamicYear();
 });
+
+/* 0. Theme Toggle Handler (Dark / Light Mode) */
+function initTheme() {
+    const btnDesktop = document.getElementById('theme-toggle-btn');
+    const btnMobile = document.getElementById('mobile-theme-toggle-btn');
+
+    if (btnDesktop) {
+        btnDesktop.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleTheme();
+        });
+    }
+
+    if (btnMobile) {
+        btnMobile.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleTheme();
+        });
+    }
+
+    const savedTheme = localStorage.getItem('portfolio-theme');
+    if (savedTheme === 'light') {
+        setTheme('light');
+    } else {
+        setTheme('dark');
+    }
+}
+
+function toggleTheme() {
+    const isLight = document.body.classList.contains('light-mode') || !document.documentElement.classList.contains('dark');
+    const newTheme = isLight ? 'dark' : 'light';
+    setTheme(newTheme);
+}
+
+window.toggleTheme = toggleTheme;
+
+function setTheme(theme) {
+    const desktopIcon = document.getElementById('theme-toggle-icon');
+    const mobileIcon = document.getElementById('mobile-theme-icon');
+    const mobileText = document.getElementById('mobile-theme-text');
+
+    if (theme === 'light') {
+        document.body.classList.add('light-mode');
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('portfolio-theme', 'light');
+
+        if (desktopIcon) desktopIcon.className = 'fa-solid fa-moon text-lg text-indigo-600 pointer-events-none';
+        if (mobileIcon) mobileIcon.className = 'fa-solid fa-moon text-indigo-600 pointer-events-none';
+        if (mobileText) mobileText.textContent = 'Switch to Dark Mode';
+    } else {
+        document.body.classList.remove('light-mode');
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('portfolio-theme', 'dark');
+
+        if (desktopIcon) desktopIcon.className = 'fa-solid fa-sun text-lg text-amber-400 pointer-events-none';
+        if (mobileIcon) mobileIcon.className = 'fa-solid fa-sun text-amber-400 pointer-events-none';
+        if (mobileText) mobileText.textContent = 'Switch to Light Mode';
+    }
+}
 
 /* 1. Preloader Handler */
 function initPreloader() {
@@ -550,39 +610,300 @@ function openProjectModal(projectId) {
     const modal = document.getElementById('project-modal');
     const content = document.getElementById('project-modal-body');
 
+    const isDimSystem = p.id === 'dim-system';
+
+    const portalsHTML = p.portals ? `
+        <div class="mb-6">
+            <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-3 font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-layer-group"></i> Integrated Access Portals
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                ${p.portals.map(portal => `
+                    <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-cyan-500/40 transition-all flex items-start gap-3 group">
+                        <div class="w-9 h-9 rounded-xl ${portal.color === 'blue' ? 'bg-blue-500/20 text-blue-400' : portal.color === 'emerald' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-purple-500/20 text-purple-400'} flex items-center justify-center text-base shrink-0">
+                            <i class="fa-solid ${portal.icon}"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-xs text-slate-100 group-hover:text-cyan-300 transition-colors">${portal.title}</h5>
+                            <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">${portal.desc}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    ` : '';
+
+    const sectorsHTML = p.sectors ? `
+        <div class="mb-6">
+            <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2.5 font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-users-viewfinder"></i> Supported Welfare Sectors
+            </h4>
+            <div class="flex flex-wrap gap-2">
+                ${p.sectors.map(sector => `
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-800/80 text-slate-200 border border-slate-700/80">
+                        <span class="w-2 h-2 rounded-full ${sector === 'Senior Citizen' ? 'bg-blue-400' : sector === 'PWD' ? 'bg-emerald-400' : sector === 'Youth' ? 'bg-amber-400' : 'bg-purple-400'}"></span>
+                        ${sector}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+    ` : '';
+
+    const liveDemoTabHTML = isDimSystem ? `
+        <div class="mb-6 border-b border-slate-800 flex gap-4 text-xs font-semibold">
+            <button id="tab-btn-overview" onclick="switchProjectModalTab('overview')" class="pb-2.5 text-cyan-400 border-b-2 border-cyan-400 font-mono flex items-center gap-2">
+                <i class="fa-solid fa-circle-info"></i> Project Overview
+            </button>
+            <button id="tab-btn-demo" onclick="switchProjectModalTab('demo')" class="pb-2.5 text-slate-400 hover:text-cyan-300 font-mono flex items-center gap-2">
+                <i class="fa-solid fa-desktop"></i> Live MSWDO Portal Mockup
+            </button>
+        </div>
+    ` : '';
+
     content.innerHTML = `
-        <div class="relative h-64 rounded-2xl overflow-hidden mb-6 bg-slate-950 border border-slate-800">
-            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
-        </div>
-        <div class="flex items-center gap-2 mb-2">
-            <span class="text-xs font-mono px-3 py-1 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/40 uppercase">${p.category}</span>
-        </div>
-        <h2 class="text-2xl font-bold text-slate-100 mb-3">${p.title}</h2>
-        <p class="text-slate-300 text-sm leading-relaxed mb-6">${p.fullDesc}</p>
+        ${liveDemoTabHTML}
         
-        <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2 font-semibold">Key Highlights & Architecture</h4>
-        <ul class="space-y-2 mb-6 text-sm text-slate-300">
-            ${p.highlights.map(h => `<li class="flex items-start gap-2"><i class="fa-solid fa-shield-halved text-cyan-400 text-xs mt-1"></i> <span>${h}</span></li>`).join('')}
-        </ul>
+        <div id="project-tab-overview" class="space-y-6">
+            <div class="relative rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 group max-h-80">
+                <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+                <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                    <span class="text-xs font-mono px-3 py-1 rounded-full bg-slate-900/90 text-cyan-400 border border-cyan-800/50">
+                        <i class="fa-solid fa-shield-cat mr-1"></i> Data Privacy Act 2012 Compliant
+                    </span>
+                    <a href="${p.image}" target="_blank" class="px-3 py-1 rounded-full bg-cyan-500/20 hover:bg-cyan-500 text-cyan-300 hover:text-slate-950 text-xs font-semibold backdrop-blur-md border border-cyan-500/40 transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-expand"></i> View Full Screenshot
+                    </a>
+                </div>
+            </div>
 
-        <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2 font-semibold">Technologies Used</h4>
-        <div class="flex flex-wrap gap-2 mb-8">
-            ${p.technologies.map(tech => `<span class="text-xs font-mono px-3 py-1 rounded-lg bg-slate-800 text-cyan-300 border border-slate-700">${tech}</span>`).join('')}
+            <div>
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <span class="text-xs font-mono px-3 py-1 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/40 uppercase font-semibold">${p.category}</span>
+                    ${p.subtitle ? `<span class="text-xs font-mono px-3 py-1 rounded-full bg-blue-950 text-blue-300 border border-blue-800/40 font-medium">${p.subtitle}</span>` : ''}
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-3">${p.title}</h2>
+                <p class="text-slate-300 text-sm sm:text-base leading-relaxed">${p.fullDesc}</p>
+            </div>
+
+            ${portalsHTML}
+            ${sectorsHTML}
+
+            <div>
+                <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2.5 font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved"></i> Key Highlights & Features
+                </h4>
+                <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs sm:text-sm text-slate-300">
+                    ${p.highlights.map(h => `
+                        <li class="flex items-start gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800/80">
+                            <i class="fa-solid fa-check text-cyan-400 text-xs mt-0.5 shrink-0"></i>
+                            <span>${h}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2 font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-code"></i> Technologies & Frameworks
+                </h4>
+                <div class="flex flex-wrap gap-2">
+                    ${p.technologies.map(tech => `
+                        <span class="text-xs font-mono px-3 py-1.5 rounded-xl bg-slate-800/90 text-cyan-300 border border-slate-700/80">${tech}</span>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-800">
+                ${isDimSystem ? `
+                    <button onclick="switchProjectModalTab('demo')" class="px-4 py-2.5 rounded-xl bg-cyan-950 hover:bg-cyan-900 border border-cyan-800/60 text-cyan-300 text-xs font-semibold flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-desktop"></i> Interactive Portal Demo
+                    </button>
+                ` : '<div></div>'}
+                <div class="flex items-center gap-3">
+                    <a href="${p.github}" target="_blank" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-2 transition-all">
+                        <i class="fab fa-github text-sm"></i> GitHub Repo
+                    </a>
+                    <a href="${p.demo}" target="_blank" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-cyan-500/20">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> Live Project
+                    </a>
+                </div>
+            </div>
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-            <a href="${p.github}" target="_blank" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-2 transition-all">
-                <i class="fab fa-github text-sm"></i> GitHub Repo
-            </a>
-            <a href="${p.demo}" target="_blank" class="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-cyan-500/20">
-                <i class="fa-solid fa-up-right-from-square text-xs"></i> Live Project
-            </a>
-        </div>
+        ${isDimSystem ? `
+            <div id="project-tab-demo" class="hidden space-y-4">
+                <div class="rounded-2xl overflow-hidden border border-slate-700 shadow-2xl bg-white text-slate-800 text-left font-sans">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[500px]">
+                        <!-- Left Panel: MSWDO Branding & Info -->
+                        <div class="lg:col-span-6 p-8 bg-gradient-to-br from-[#082a2b] via-[#0b3c3b] to-[#041a1b] text-white flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute -top-20 -left-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                            
+                            <div class="space-y-6 relative z-10">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-cyan-300 font-bold">
+                                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-base tracking-wider uppercase leading-none">MSWDO</h3>
+                                        <p class="text-[10px] text-emerald-300 font-semibold tracking-wide uppercase">Municipal Social Welfare and Development Office</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <span class="text-[10px] font-mono tracking-widest text-cyan-300 uppercase font-bold px-2.5 py-1 rounded bg-white/10 border border-white/15">
+                                        Accessible Community Services
+                                    </span>
+                                </div>
+
+                                <h2 class="text-2xl sm:text-3xl font-extrabold leading-tight tracking-tight text-white">
+                                    Social welfare support, made easier to access.
+                                </h2>
+
+                                <p class="text-xs text-slate-300 leading-relaxed">
+                                    Apply for programs, monitor requests, and receive assistance updates through one secure municipal portal.
+                                </p>
+
+                                <div class="flex flex-wrap gap-2 pt-2">
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-950/80 text-blue-300 border border-blue-500/30 flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-blue-400"></span> Senior Citizen
+                                    </span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> PWD
+                                    </span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-950/80 text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-amber-400"></span> Youth
+                                    </span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-950/80 text-purple-300 border border-purple-500/30 flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-purple-400"></span> Women
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="pt-8 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-300 relative z-10">
+                                <span>Protected under the Data Privacy Act of 2012</span>
+                                <span class="flex items-center gap-1.5 text-emerald-400 font-semibold px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> System Online
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Portal Sign In Selection -->
+                        <div class="lg:col-span-6 p-8 bg-slate-50 flex flex-col justify-between text-slate-800">
+                            <div>
+                                <h3 class="text-2xl font-bold text-slate-900">Sign in</h3>
+                                <p class="text-xs text-slate-500 mb-6">Choose your access portal to continue</p>
+
+                                <div class="space-y-3">
+                                    <div onclick="simulatePortalAction('Staff Portal')" class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-blue-500 hover:shadow-md cursor-pointer transition-all flex items-center justify-between group">
+                                        <div class="flex items-center gap-3.5">
+                                            <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-sm">
+                                                <i class="fa-solid fa-shield-halved"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">Staff Portal</h4>
+                                                <p class="text-xs text-slate-500">For MSWDO staff and administrators</p>
+                                            </div>
+                                        </div>
+                                        <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all text-xs"></i>
+                                    </div>
+
+                                    <div onclick="simulatePortalAction('Applicant Portal')" class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-emerald-500 hover:shadow-md cursor-pointer transition-all flex items-center justify-between group">
+                                        <div class="flex items-center gap-3.5">
+                                            <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg shadow-sm">
+                                                <i class="fa-solid fa-user-plus"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-sm text-slate-900 group-hover:text-emerald-600 transition-colors">Applicant Portal</h4>
+                                                <p class="text-xs text-slate-500">For registered welfare beneficiaries</p>
+                                            </div>
+                                        </div>
+                                        <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all text-xs"></i>
+                                    </div>
+
+                                    <div onclick="simulatePortalAction('Program Application')" class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-purple-500 hover:shadow-md cursor-pointer transition-all flex items-center justify-between group">
+                                        <div class="flex items-center gap-3.5">
+                                            <div class="w-11 h-11 rounded-xl bg-purple-600 text-white flex items-center justify-center text-lg shadow-sm">
+                                                <i class="fa-solid fa-file-lines"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-sm text-slate-900 group-hover:text-purple-600 transition-colors">Program Application</h4>
+                                                <p class="text-xs text-slate-500">Submit a new application for MSWDO assistance</p>
+                                            </div>
+                                        </div>
+                                        <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all text-xs"></i>
+                                    </div>
+                                </div>
+
+                                <div class="my-6 flex items-center gap-3">
+                                    <div class="h-px bg-slate-200 flex-1"></div>
+                                    <span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">SECURE GOVERNMENT SYSTEM</span>
+                                    <div class="h-px bg-slate-200 flex-1"></div>
+                                </div>
+
+                                <div class="p-4 rounded-2xl bg-white border border-slate-200 text-xs text-slate-600 flex items-start gap-3">
+                                    <i class="fa-solid fa-shield-check text-emerald-600 text-lg mt-0.5 shrink-0"></i>
+                                    <div>
+                                        <h5 class="font-bold text-slate-900 text-xs">Your information is handled securely</h5>
+                                        <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                                            Protected under the Data Privacy Act of 2012. For application or access assistance, contact your local MSWDO office.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-[10px] text-slate-400 text-center pt-4 border-t border-slate-200">
+                                Republic of the Philippines - Municipal Government - © 2026
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="portal-action-alert" class="hidden p-3 rounded-xl bg-cyan-950 border border-cyan-800 text-cyan-300 text-xs font-mono text-center">
+                </div>
+            </div>
+        ` : ''}
     `;
 
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
+}
+
+function switchProjectModalTab(tab) {
+    const overviewTab = document.getElementById('project-tab-overview');
+    const demoTab = document.getElementById('project-tab-demo');
+    const btnOverview = document.getElementById('tab-btn-overview');
+    const btnDemo = document.getElementById('tab-btn-demo');
+
+    if (!overviewTab || !demoTab) return;
+
+    if (tab === 'overview') {
+        overviewTab.classList.remove('hidden');
+        demoTab.classList.add('hidden');
+        btnOverview.classList.add('text-cyan-400', 'border-b-2', 'border-cyan-400');
+        btnOverview.classList.remove('text-slate-400');
+        btnDemo.classList.remove('text-cyan-400', 'border-b-2', 'border-cyan-400');
+        btnDemo.classList.add('text-slate-400');
+    } else {
+        overviewTab.classList.add('hidden');
+        demoTab.classList.remove('hidden');
+        btnDemo.classList.add('text-cyan-400', 'border-b-2', 'border-cyan-400');
+        btnDemo.classList.remove('text-slate-400');
+        btnOverview.classList.remove('text-cyan-400', 'border-b-2', 'border-cyan-400');
+        btnOverview.classList.add('text-slate-400');
+    }
+}
+
+function simulatePortalAction(portalName) {
+    const alertBox = document.getElementById('portal-action-alert');
+    if (!alertBox) return;
+
+    alertBox.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Connecting to <strong>${portalName}</strong> endpoint (Encrypted SSL Session)...`;
+    alertBox.classList.remove('hidden');
+
+    setTimeout(() => {
+        alertBox.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i> Accessing <strong>${portalName}</strong> authentication portal... Redirecting to MSWDO secure server.`;
+    }, 1000);
 }
 
 function openCertModal(certId) {

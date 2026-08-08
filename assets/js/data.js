@@ -117,17 +117,25 @@ const portfolioData = {
         {
             id: "dim-system",
             title: "Digital Information Management System",
+            subtitle: "MSWDO Municipal Social Welfare Portal",
             category: "webapp",
             image: "assets/images/project-1.jpg",
-            shortDesc: "Comprehensive web-based information management portal built for centralized records, security controls, and efficient document retrieval.",
-            fullDesc: "Designed and developed an end-to-end Digital Information Management System web application. Features role-based user management, encrypted data storage, audit trails, and intuitive search filters to streamline organizational information workflows.",
-            technologies: ["HTML5", "CSS3", "Tailwind CSS", "JavaScript", "Firebase"],
+            shortDesc: "Centralized Municipal Social Welfare & Development Office (MSWDO) portal with multi-tier access for Staff, Beneficiaries, and Assistance Applicants.",
+            fullDesc: "Designed and developed an end-to-end Digital Information Management System for the Municipal Social Welfare and Development Office (MSWDO). The platform delivers role-based portals for Staff Administrators, Registered Welfare Beneficiaries, and New Program Applicants. Fully compliant with the Data Privacy Act of 2012, it streamlines social welfare assistance tracking across Senior Citizen, PWD, Youth, and Women community sectors.",
+            technologies: ["HTML5", "CSS3", "Tailwind CSS", "JavaScript", "Firebase", "RBAC Security"],
             github: "https://github.com/KennethAguitong/digital-information-management-system",
             demo: "https://kennethaguitong.github.io/digital-information-management-system",
+            portals: [
+                { title: "Staff Portal", desc: "For MSWDO staff and administrators", icon: "fa-shield-halved", color: "blue" },
+                { title: "Applicant Portal", desc: "For registered welfare beneficiaries", icon: "fa-user-plus", color: "emerald" },
+                { title: "Program Application", desc: "Submit a new application for MSWDO assistance", icon: "fa-file-lines", color: "purple" }
+            ],
+            sectors: ["Senior Citizen", "PWD", "Youth", "Women"],
             highlights: [
-                "Role-Based Access Control (RBAC) securing confidential record categories.",
-                "Automated data indexing and real-time search filters.",
-                "Responsive glassmorphic UI optimized for desktop and tablet displays."
+                "Multi-Portal Access Control: Isolated login flows for Staff Administrators, Registered Beneficiaries, and New Applicants.",
+                "Targeted Beneficiary Sectors: Dedicated welfare assistance workflows for Senior Citizens, PWDs, Youth, and Women.",
+                "Data Privacy Act of 2012 Compliance: Encrypted records storage, administrative audit trails, and privacy compliance.",
+                "Real-Time Monitoring & Telemetry: Live system status badges and automated request tracking."
             ]
         },
         {
