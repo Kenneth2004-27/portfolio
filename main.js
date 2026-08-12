@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initContactForm();
     initModals();
     initDynamicYear();
+    setTimeout(animateCounters, 500);
 });
 
 /* 1. Preloader Handler */
@@ -178,47 +179,67 @@ function initScrollProgress() {
     });
 }
 
+function getPortfolioData() {
+    return window.portfolioData || (typeof portfolioData !== 'undefined' ? portfolioData : null);
+}
+
 /* 7. Scroll Reveal & Skill Progress Trigger */
 function initScrollReveal() {
     const observerOptions = {
         root: null,
-        rootMargin: '0px',
-        threshold: 0.15
+        rootMargin: '50px',
+        threshold: 0.05
     };
 
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-                
-                // Trigger Skill Bar Fill if this element is a skill container
-                if (entry.target.id === 'skills-container') {
-                    animateSkillBars();
-                    animateCircularSkills();
-                }
-                
-                // Trigger Counter stats animation
-                if (entry.target.id === 'stats-container') {
-                    animateCounters();
-                }
+    if ('IntersectionObserver' in window) {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    
+                    if (entry.target.id === 'skills-container') {
+                        animateSkillBars();
+                        animateCircularSkills();
+                    }
+                    
+                    if (entry.target.id === 'stats-container') {
+                        animateCounters();
+                    }
 
-                observer.unobserve(entry.target);
-            }
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right, #skills-container, #stats-container').forEach(el => {
+            revealObserver.observe(el);
         });
-    }, observerOptions);
+    }
 
-    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, #skills-container, #stats-container').forEach(el => {
-        revealObserver.observe(el);
-    });
+    // Safety fallback: Ensure all sections are active and visible after 1 second
+    setTimeout(() => {
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right, #skills-container, #stats-container').forEach(el => {
+            el.classList.add('active');
+        });
+        animateSkillBars();
+        animateCircularSkills();
+        animateCounters();
+    }, 1000);
 }
 
 /* 8. Render Skills Section & Progress Bars */
 function renderSkills() {
     const skillList = document.getElementById('linear-skills-list');
     const circularList = document.getElementById('circular-skills-list');
+    const data = getPortfolioData();
 
-    if (skillList && portfolioData.skills) {
-        skillList.innerHTML = portfolioData.skills.map(skill => `
+    if (!data) {
+        setTimeout(renderSkills, 100);
+        return;
+    }
+
+    if (skillList && data.skills) {
+        skillList.innerHTML = data.skills.map(skill => `
             <div class="glass-card p-4 rounded-2xl">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center gap-3">
@@ -236,8 +257,8 @@ function renderSkills() {
         `).join('');
     }
 
-    if (circularList && portfolioData.circularSkills) {
-        circularList.innerHTML = portfolioData.circularSkills.map(cSkill => {
+    if (circularList && data.circularSkills) {
+        circularList.innerHTML = data.circularSkills.map(cSkill => {
             const radius = 38;
             const circumference = 2 * Math.PI * radius;
             return `
@@ -262,6 +283,11 @@ function renderSkills() {
             `;
         }).join('');
     }
+
+    setTimeout(() => {
+        animateSkillBars();
+        animateCircularSkills();
+    }, 300);
 }
 
 function animateSkillBars() {
@@ -304,9 +330,16 @@ function animateCounters() {
 /* 10. Certifications Render & Viewer */
 function renderCertifications() {
     const container = document.getElementById('certifications-grid');
-    if (!container || !portfolioData.certifications) return;
+    const data = getPortfolioData();
 
-    container.innerHTML = portfolioData.certifications.map(cert => `
+    if (!data) {
+        setTimeout(renderCertifications, 100);
+        return;
+    }
+
+    if (!container || !data.certifications) return;
+
+    container.innerHTML = data.certifications.map(cert => `
         <div class="glass-card p-6 rounded-3xl relative overflow-hidden group cursor-pointer border border-slate-800 hover:border-cyan-500/50" onclick="openCertModal('${cert.id}')">
             <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-cyan-500/10 rounded-full blur-xl group-hover:bg-cyan-500/20 transition-all"></div>
             <div class="flex items-start gap-4 mb-4">
@@ -332,8 +365,14 @@ function renderCertifications() {
 function renderProjects(filterCategory = 'all') {
     const grid = document.getElementById('projects-grid');
     const filterBtns = document.querySelectorAll('.project-filter-btn');
+    const data = getPortfolioData();
 
-    if (!grid || !portfolioData.projects) return;
+    if (!data) {
+        setTimeout(() => renderProjects(filterCategory), 100);
+        return;
+    }
+
+    if (!grid || !data.projects) return;
 
     // Update active filter button state
     filterBtns.forEach(btn => {
@@ -348,8 +387,8 @@ function renderProjects(filterCategory = 'all') {
     });
 
     const filtered = filterCategory === 'all'
-        ? portfolioData.projects
-        : portfolioData.projects.filter(p => p.category === filterCategory);
+        ? data.projects
+        : data.projects.filter(p => p.category === filterCategory);
 
     grid.innerHTML = filtered.map(p => `
         <div class="glass-card rounded-3xl overflow-hidden group flex flex-col h-full border border-slate-800 hover:border-cyan-500/40">
@@ -399,7 +438,14 @@ document.addEventListener('click', (e) => {
 /* 12. Vertical Timeline Render */
 function renderTimeline() {
     const container = document.getElementById('timeline-container');
-    if (!container || !portfolioData.timeline) return;
+    const data = getPortfolioData();
+
+    if (!data) {
+        setTimeout(renderTimeline, 100);
+        return;
+    }
+
+    if (!container || !data.timeline) return;
 
     container.innerHTML = portfolioData.timeline.map((item, index) => `
         <div class="relative pl-8 md:pl-0 mb-10 group">
@@ -427,96 +473,142 @@ function renderTimeline() {
     `).join('');
 }
 
-/* 13. Contact Form Validation & Toast */
+/* 13. Contact Form Validation & Message Dispatcher */
 function initContactForm() {
     const form = document.getElementById('contact-form');
-    const toast = document.getElementById('contact-toast');
-
     if (!form) return;
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
+    const nameInput = document.getElementById('form-name');
+    const emailInput = document.getElementById('form-email');
+    const subjectInput = document.getElementById('form-subject');
+    const messageInput = document.getElementById('form-message');
+    const inputs = [nameInput, emailInput, subjectInput, messageInput].filter(Boolean);
 
-        const nameInput = document.getElementById('form-name');
-        const emailInput = document.getElementById('form-email');
-        const subjectInput = document.getElementById('form-subject');
-        const messageInput = document.getElementById('form-message');
+    // HCI Error Prevention: Live visual feedback clearing on input change
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            input.classList.remove('border-red-500', 'ring-2', 'ring-red-500/50');
+        });
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
         let isValid = true;
 
-        // Reset errors
-        [nameInput, emailInput, subjectInput, messageInput].forEach(input => {
-            if (input) input.classList.remove('border-red-500');
+        // Reset error states
+        inputs.forEach(input => {
+            input.classList.remove('border-red-500', 'ring-2', 'ring-red-500/50');
         });
 
-        if (!nameInput.value.trim()) {
-            nameInput.classList.add('border-red-500');
+        if (!nameInput || !nameInput.value.trim()) {
+            if (nameInput) nameInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/50');
             isValid = false;
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailInput.value.trim() || !emailRegex.test(emailInput.value.trim())) {
-            emailInput.classList.add('border-red-500');
+        if (!emailInput || !emailInput.value.trim() || !emailRegex.test(emailInput.value.trim())) {
+            if (emailInput) emailInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/50');
             isValid = false;
         }
 
-        if (!subjectInput.value.trim()) {
-            subjectInput.classList.add('border-red-500');
+        if (!subjectInput || !subjectInput.value.trim()) {
+            if (subjectInput) subjectInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/50');
             isValid = false;
         }
 
-        if (!messageInput.value.trim() || messageInput.value.trim().length < 10) {
-            messageInput.classList.add('border-red-500');
+        if (!messageInput || !messageInput.value.trim() || messageInput.value.trim().length < 10) {
+            if (messageInput) messageInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/50');
             isValid = false;
         }
 
         if (!isValid) {
-            showToast("Please fix the highlighted fields before submitting.", "error");
+            showToast("Please fill out all required fields correctly before sending.", "error");
             return;
         }
 
-        // Simulate successful email dispatch
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalBtnText = submitBtn.innerHTML;
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending...`;
+        submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Transmitting Message...`;
 
-        setTimeout(() => {
-            form.reset();
+        const payload = {
+            name: nameInput.value.trim(),
+            email: emailInput.value.trim(),
+            subject: subjectInput.value.trim(),
+            message: messageInput.value.trim()
+        };
+
+        try {
+            let res;
+            if (typeof window.sendSupabaseContactMessage === 'function') {
+                res = await window.sendSupabaseContactMessage(payload);
+            } else {
+                await new Promise(r => setTimeout(r, 800));
+                res = { success: true, message: "Thank you! Your message has been sent successfully." };
+            }
+
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnText;
-            showToast("Thank you! Your message has been sent successfully. I will get back to you shortly.", "success");
-        }, 1200);
+
+            if (res.success) {
+                form.reset();
+                showToast(res.message || "Your message was sent successfully!", "success");
+            } else {
+                showToast(res.message || "Failed to send message.", "error");
+            }
+        } catch (err) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+            showToast("Error processing message: " + (err.message || "Network error"), "error");
+        }
     });
 }
+
+let toastTimer = null;
 
 function showToast(message, type = "success") {
     const toast = document.getElementById('contact-toast');
     if (!toast) return;
 
+    if (toastTimer) clearTimeout(toastTimer);
+
     const icon = type === "success" 
-        ? '<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>' 
-        : '<i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg"></i>';
+        ? '<i class="fa-solid fa-circle-check text-emerald-400 text-lg shrink-0"></i>' 
+        : '<i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg shrink-0"></i>';
 
     toast.innerHTML = `
-        <div class="flex items-center gap-3 glass-card px-5 py-3.5 rounded-2xl border ${type === "success" ? "border-emerald-500/40 bg-slate-900/90 text-slate-100" : "border-rose-500/40 bg-slate-900/90 text-slate-100"} shadow-2xl">
-            ${icon}
-            <span class="text-sm font-medium">${message}</span>
+        <div class="flex items-center justify-between gap-3 glass-card px-5 py-3.5 rounded-2xl border ${type === "success" ? "border-emerald-500/40 bg-slate-900/95 text-slate-100" : "border-rose-500/40 bg-slate-900/95 text-slate-100"} shadow-2xl">
+            <div class="flex items-center gap-3">
+                ${icon}
+                <span class="text-sm font-medium">${message}</span>
+            </div>
+            <button type="button" onclick="hideToast()" aria-label="Close notification" class="text-slate-400 hover:text-white transition-colors p-1 cursor-pointer">
+                <i class="fa-solid fa-xmark text-base"></i>
+            </button>
         </div>
     `;
 
     toast.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
-    toast.classList.add('translate-y-0', 'opacity-100');
+    toast.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
 
-    setTimeout(() => {
-        toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
-        toast.classList.remove('translate-y-0', 'opacity-100');
-    }, 4500);
+    toastTimer = setTimeout(() => {
+        hideToast();
+    }, 5000);
 }
+
+function hideToast() {
+    const toast = document.getElementById('contact-toast');
+    if (!toast) return;
+    toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
+    toast.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+}
+window.hideToast = hideToast;
+
+let lastFocusedElement = null;
 
 /* 14. Modals Controller (Project, Certificate, CV Preview) */
 function initModals() {
-    // Global close listeners
     document.querySelectorAll('.modal-close-btn').forEach(btn => {
         btn.addEventListener('click', closeAllModals);
     });
@@ -536,57 +628,334 @@ function initModals() {
     });
 }
 
+function openModal(modalElement) {
+    if (!modalElement) return;
+    lastFocusedElement = document.activeElement;
+    modalElement.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    const closeBtn = modalElement.querySelector('.modal-close-btn');
+    if (closeBtn) closeBtn.focus();
+}
+
 function closeAllModals() {
     document.querySelectorAll('.modal-overlay').forEach(modal => {
         modal.classList.remove('open');
     });
     document.body.style.overflow = '';
+    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+        lastFocusedElement.focus();
+        lastFocusedElement = null;
+    }
 }
 
 function openProjectModal(projectId) {
-    const p = portfolioData.projects.find(item => item.id === projectId);
+    const data = getPortfolioData();
+    if (!data || !data.projects) return;
+    const p = data.projects.find(item => item.id === projectId);
     if (!p) return;
 
     const modal = document.getElementById('project-modal');
     const content = document.getElementById('project-modal-body');
 
+    const isDimSystem = p.id === 'dim-system';
+
+    const portalsHTML = p.portals ? `
+        <div class="mb-6">
+            <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-3 font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-layer-group"></i> Integrated Access Portals
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                ${p.portals.map(portal => `
+                    <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-cyan-500/40 transition-all flex items-start gap-3 group">
+                        <div class="w-9 h-9 rounded-xl ${portal.color === 'blue' ? 'bg-blue-500/20 text-blue-400' : portal.color === 'emerald' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-purple-500/20 text-purple-400'} flex items-center justify-center text-base shrink-0">
+                            <i class="fa-solid ${portal.icon}"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-xs text-slate-100 group-hover:text-cyan-300 transition-colors">${portal.title}</h5>
+                            <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">${portal.desc}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    ` : '';
+
+    const sectorsHTML = p.sectors ? `
+        <div class="mb-6">
+            <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2.5 font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-users-viewfinder"></i> Supported Welfare Sectors
+            </h4>
+            <div class="flex flex-wrap gap-2">
+                ${p.sectors.map(sector => `
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-800/80 text-slate-200 border border-slate-700/80">
+                        <span class="w-2 h-2 rounded-full ${sector === 'Senior Citizen' ? 'bg-blue-400' : sector === 'PWD' ? 'bg-emerald-400' : sector === 'Youth' ? 'bg-amber-400' : 'bg-purple-400'}"></span>
+                        ${sector}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+    ` : '';
+
+    const liveDemoTabHTML = isDimSystem ? `
+        <div class="mb-6 border-b border-slate-800 flex gap-4 text-xs font-semibold">
+            <button id="tab-btn-overview" onclick="switchProjectModalTab('overview')" class="pb-2.5 text-cyan-400 border-b-2 border-cyan-400 font-mono flex items-center gap-2">
+                <i class="fa-solid fa-circle-info"></i> Project Overview
+            </button>
+            <button id="tab-btn-demo" onclick="switchProjectModalTab('demo')" class="pb-2.5 text-slate-400 hover:text-cyan-300 font-mono flex items-center gap-2">
+                <i class="fa-solid fa-desktop"></i> Live MSWDO Portal Mockup
+            </button>
+        </div>
+    ` : '';
+
     content.innerHTML = `
-        <div class="relative h-64 rounded-2xl overflow-hidden mb-6 bg-slate-950 border border-slate-800">
-            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
-        </div>
-        <div class="flex items-center gap-2 mb-2">
-            <span class="text-xs font-mono px-3 py-1 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/40 uppercase">${p.category}</span>
-        </div>
-        <h2 class="text-2xl font-bold text-slate-100 mb-3">${p.title}</h2>
-        <p class="text-slate-300 text-sm leading-relaxed mb-6">${p.fullDesc}</p>
+        ${liveDemoTabHTML}
         
-        <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2 font-semibold">Key Highlights & Architecture</h4>
-        <ul class="space-y-2 mb-6 text-sm text-slate-300">
-            ${p.highlights.map(h => `<li class="flex items-start gap-2"><i class="fa-solid fa-shield-halved text-cyan-400 text-xs mt-1"></i> <span>${h}</span></li>`).join('')}
-        </ul>
+        <div id="project-tab-overview" class="space-y-6">
+            <div class="relative rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 group max-h-80">
+                <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+                <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                    <span class="text-xs font-mono px-3 py-1 rounded-full bg-slate-900/90 text-cyan-400 border border-cyan-800/50">
+                        <i class="fa-solid fa-shield-cat mr-1"></i> Data Privacy Act 2012 Compliant
+                    </span>
+                    <a href="${p.image}" target="_blank" class="px-3 py-1 rounded-full bg-cyan-500/20 hover:bg-cyan-500 text-cyan-300 hover:text-slate-950 text-xs font-semibold backdrop-blur-md border border-cyan-500/40 transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-expand"></i> View Full Screenshot
+                    </a>
+                </div>
+            </div>
 
-        <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2 font-semibold">Technologies Used</h4>
-        <div class="flex flex-wrap gap-2 mb-8">
-            ${p.technologies.map(tech => `<span class="text-xs font-mono px-3 py-1 rounded-lg bg-slate-800 text-cyan-300 border border-slate-700">${tech}</span>`).join('')}
+            <div>
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <span class="text-xs font-mono px-3 py-1 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/40 uppercase font-semibold">${p.category}</span>
+                    ${p.subtitle ? `<span class="text-xs font-mono px-3 py-1 rounded-full bg-blue-950 text-blue-300 border border-blue-800/40 font-medium">${p.subtitle}</span>` : ''}
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-3">${p.title}</h2>
+                <p class="text-slate-300 text-sm sm:text-base leading-relaxed">${p.fullDesc}</p>
+            </div>
+
+            ${portalsHTML}
+            ${sectorsHTML}
+
+            <div>
+                <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2.5 font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved"></i> Key Highlights & Features
+                </h4>
+                <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs sm:text-sm text-slate-300">
+                    ${p.highlights.map(h => `
+                        <li class="flex items-start gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800/80">
+                            <i class="fa-solid fa-check text-cyan-400 text-xs mt-0.5 shrink-0"></i>
+                            <span>${h}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2 font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-code"></i> Technologies & Frameworks
+                </h4>
+                <div class="flex flex-wrap gap-2">
+                    ${p.technologies.map(tech => `
+                        <span class="text-xs font-mono px-3 py-1.5 rounded-xl bg-slate-800/90 text-cyan-300 border border-slate-700/80">${tech}</span>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-800">
+                ${isDimSystem ? `
+                    <button onclick="switchProjectModalTab('demo')" class="px-4 py-2.5 rounded-xl bg-cyan-950 hover:bg-cyan-900 border border-cyan-800/60 text-cyan-300 text-xs font-semibold flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-desktop"></i> Interactive Portal Demo
+                    </button>
+                ` : '<div></div>'}
+                <div class="flex items-center gap-3">
+                    <a href="${p.github}" target="_blank" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-2 transition-all">
+                        <i class="fab fa-github text-sm"></i> GitHub Repo
+                    </a>
+                    <a href="${p.demo}" target="_blank" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-cyan-500/20">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> Live Project
+                    </a>
+                </div>
+            </div>
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-            <a href="${p.github}" target="_blank" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-2 transition-all">
-                <i class="fab fa-github text-sm"></i> GitHub Repo
-            </a>
-            <a href="${p.demo}" target="_blank" class="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-cyan-500/20">
-                <i class="fa-solid fa-up-right-from-square text-xs"></i> Live Project
-            </a>
-        </div>
+        ${isDimSystem ? `
+            <div id="project-tab-demo" class="hidden space-y-4">
+                <div class="rounded-2xl overflow-hidden border border-slate-700 shadow-2xl bg-white text-slate-800 text-left font-sans">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[500px]">
+                        <!-- Left Panel: MSWDO Branding & Info -->
+                        <div class="lg:col-span-6 p-8 bg-gradient-to-br from-[#082a2b] via-[#0b3c3b] to-[#041a1b] text-white flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute -top-20 -left-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                            
+                            <div class="space-y-6 relative z-10">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-cyan-300 font-bold">
+                                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-base tracking-wider uppercase leading-none">MSWDO</h3>
+                                        <p class="text-[10px] text-emerald-300 font-semibold tracking-wide uppercase">Municipal Social Welfare and Development Office</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <span class="text-[10px] font-mono tracking-widest text-cyan-300 uppercase font-bold px-2.5 py-1 rounded bg-white/10 border border-white/15">
+                                        Accessible Community Services
+                                    </span>
+                                </div>
+
+                                <h2 class="text-2xl sm:text-3xl font-extrabold leading-tight tracking-tight text-white">
+                                    Social welfare support, made easier to access.
+                                </h2>
+
+                                <p class="text-xs text-slate-300 leading-relaxed">
+                                    Apply for programs, monitor requests, and receive assistance updates through one secure municipal portal.
+                                </p>
+
+                                <div class="flex flex-wrap gap-2 pt-2">
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-950/80 text-blue-300 border border-blue-500/30 flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-blue-400"></span> Senior Citizen
+                                    </span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> PWD
+                                    </span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-950/80 text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-amber-400"></span> Youth
+                                    </span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-950/80 text-purple-300 border border-purple-500/30 flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-purple-400"></span> Women
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="pt-8 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-300 relative z-10">
+                                <span>Protected under the Data Privacy Act of 2012</span>
+                                <span class="flex items-center gap-1.5 text-emerald-400 font-semibold px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> System Online
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Portal Sign In Selection -->
+                        <div class="lg:col-span-6 p-8 bg-slate-50 flex flex-col justify-between text-slate-800">
+                            <div>
+                                <h3 class="text-2xl font-bold text-slate-900">Sign in</h3>
+                                <p class="text-xs text-slate-500 mb-6">Choose your access portal to continue</p>
+
+                                <div class="space-y-3">
+                                    <div onclick="simulatePortalAction('Staff Portal')" class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-blue-500 hover:shadow-md cursor-pointer transition-all flex items-center justify-between group">
+                                        <div class="flex items-center gap-3.5">
+                                            <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-sm">
+                                                <i class="fa-solid fa-shield-halved"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">Staff Portal</h4>
+                                                <p class="text-xs text-slate-500">For MSWDO staff and administrators</p>
+                                            </div>
+                                        </div>
+                                        <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all text-xs"></i>
+                                    </div>
+
+                                    <div onclick="simulatePortalAction('Applicant Portal')" class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-emerald-500 hover:shadow-md cursor-pointer transition-all flex items-center justify-between group">
+                                        <div class="flex items-center gap-3.5">
+                                            <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg shadow-sm">
+                                                <i class="fa-solid fa-user-plus"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-sm text-slate-900 group-hover:text-emerald-600 transition-colors">Applicant Portal</h4>
+                                                <p class="text-xs text-slate-500">For registered welfare beneficiaries</p>
+                                            </div>
+                                        </div>
+                                        <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all text-xs"></i>
+                                    </div>
+
+                                    <div onclick="simulatePortalAction('Program Application')" class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-purple-500 hover:shadow-md cursor-pointer transition-all flex items-center justify-between group">
+                                        <div class="flex items-center gap-3.5">
+                                            <div class="w-11 h-11 rounded-xl bg-purple-600 text-white flex items-center justify-center text-lg shadow-sm">
+                                                <i class="fa-solid fa-file-lines"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-sm text-slate-900 group-hover:text-purple-600 transition-colors">Program Application</h4>
+                                                <p class="text-xs text-slate-500">Submit a new application for MSWDO assistance</p>
+                                            </div>
+                                        </div>
+                                        <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all text-xs"></i>
+                                    </div>
+                                </div>
+
+                                <div class="my-6 flex items-center gap-3">
+                                    <div class="h-px bg-slate-200 flex-1"></div>
+                                    <span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">SECURE GOVERNMENT SYSTEM</span>
+                                    <div class="h-px bg-slate-200 flex-1"></div>
+                                </div>
+
+                                <div class="p-4 rounded-2xl bg-white border border-slate-200 text-xs text-slate-600 flex items-start gap-3">
+                                    <i class="fa-solid fa-shield-check text-emerald-600 text-lg mt-0.5 shrink-0"></i>
+                                    <div>
+                                        <h5 class="font-bold text-slate-900 text-xs">Your information is handled securely</h5>
+                                        <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                                            Protected under the Data Privacy Act of 2012. For application or access assistance, contact your local MSWDO office.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-[10px] text-slate-400 text-center pt-4 border-t border-slate-200">
+                                Republic of the Philippines - Municipal Government - © 2026
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="portal-action-alert" class="hidden p-3 rounded-xl bg-cyan-950 border border-cyan-800 text-cyan-300 text-xs font-mono text-center">
+                </div>
+            </div>
+        ` : ''}
     `;
 
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    openModal(modal);
+}
+
+function switchProjectModalTab(tab) {
+    const overviewTab = document.getElementById('project-tab-overview');
+    const demoTab = document.getElementById('project-tab-demo');
+    const btnOverview = document.getElementById('tab-btn-overview');
+    const btnDemo = document.getElementById('tab-btn-demo');
+
+    if (!overviewTab || !demoTab) return;
+
+    if (tab === 'overview') {
+        overviewTab.classList.remove('hidden');
+        demoTab.classList.add('hidden');
+        btnOverview.classList.add('text-cyan-400', 'border-b-2', 'border-cyan-400');
+        btnOverview.classList.remove('text-slate-400');
+        btnDemo.classList.remove('text-cyan-400', 'border-b-2', 'border-cyan-400');
+        btnDemo.classList.add('text-slate-400');
+    } else {
+        overviewTab.classList.add('hidden');
+        demoTab.classList.remove('hidden');
+        btnDemo.classList.add('text-cyan-400', 'border-b-2', 'border-cyan-400');
+        btnDemo.classList.remove('text-slate-400');
+        btnOverview.classList.remove('text-cyan-400', 'border-b-2', 'border-cyan-400');
+        btnOverview.classList.add('text-slate-400');
+    }
+}
+
+function simulatePortalAction(portalName) {
+    const alertBox = document.getElementById('portal-action-alert');
+    if (!alertBox) return;
+
+    alertBox.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Connecting to <strong>${portalName}</strong> endpoint (Encrypted SSL Session)...`;
+    alertBox.classList.remove('hidden');
+
+    setTimeout(() => {
+        alertBox.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i> Accessing <strong>${portalName}</strong> authentication portal... Redirecting to MSWDO secure server.`;
+    }, 1000);
 }
 
 function openCertModal(certId) {
-    const c = portfolioData.certifications.find(item => item.id === certId);
+    const data = getPortfolioData();
+    if (!data || !data.certifications) return;
+    const c = data.certifications.find(item => item.id === certId);
     if (!c) return;
 
     const modal = document.getElementById('cert-modal');
@@ -625,14 +994,12 @@ function openCertModal(certId) {
         </div>
     `;
 
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    openModal(modal);
 }
 
 function openCVModal() {
     const modal = document.getElementById('cv-modal');
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    openModal(modal);
 }
 
 /* 15. Dynamic Year */

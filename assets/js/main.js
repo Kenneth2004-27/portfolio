@@ -473,58 +473,64 @@ function renderTimeline() {
     `).join('');
 }
 
-/* 13. Contact Form Validation & Supabase Integration */
+/* 13. Contact Form Validation & Message Dispatcher */
 function initContactForm() {
     const form = document.getElementById('contact-form');
-    const toast = document.getElementById('contact-toast');
-
     if (!form) return;
+
+    const nameInput = document.getElementById('form-name');
+    const emailInput = document.getElementById('form-email');
+    const subjectInput = document.getElementById('form-subject');
+    const messageInput = document.getElementById('form-message');
+    const inputs = [nameInput, emailInput, subjectInput, messageInput].filter(Boolean);
+
+    // HCI Error Prevention: Live visual feedback clearing on input change
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            input.classList.remove('border-red-500', 'ring-2', 'ring-red-500/50');
+        });
+    });
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const nameInput = document.getElementById('form-name');
-        const emailInput = document.getElementById('form-email');
-        const subjectInput = document.getElementById('form-subject');
-        const messageInput = document.getElementById('form-message');
-
         let isValid = true;
 
-        // Reset errors
-        [nameInput, emailInput, subjectInput, messageInput].forEach(input => {
-            if (input) input.classList.remove('border-red-500');
+        // Reset error states
+        inputs.forEach(input => {
+            input.classList.remove('border-red-500', 'ring-2', 'ring-red-500/50');
         });
 
         if (!nameInput || !nameInput.value.trim()) {
-            if (nameInput) nameInput.classList.add('border-red-500');
+            if (nameInput) nameInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/50');
             isValid = false;
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailInput || !emailInput.value.trim() || !emailRegex.test(emailInput.value.trim())) {
-            if (emailInput) emailInput.classList.add('border-red-500');
+            if (emailInput) emailInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/50');
             isValid = false;
         }
 
         if (!subjectInput || !subjectInput.value.trim()) {
-            if (subjectInput) subjectInput.classList.add('border-red-500');
+            if (subjectInput) subjectInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/50');
             isValid = false;
         }
 
         if (!messageInput || !messageInput.value.trim() || messageInput.value.trim().length < 10) {
-            if (messageInput) messageInput.classList.add('border-red-500');
+            if (messageInput) messageInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/50');
             isValid = false;
         }
 
         if (!isValid) {
-            showToast("Please fix the highlighted fields before submitting.", "error");
+            showToast("Please fill out all required fields correctly before sending.", "error");
             return;
         }
 
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalBtnText = submitBtn.innerHTML;
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Transmitting via Supabase...`;
+        submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Transmitting Message...`;
 
         const payload = {
             name: nameInput.value.trim(),
@@ -547,7 +553,7 @@ function initContactForm() {
 
             if (res.success) {
                 form.reset();
-                showToast(res.message, "success");
+                showToast(res.message || "Your message was sent successfully!", "success");
             } else {
                 showToast(res.message || "Failed to send message.", "error");
             }
@@ -559,33 +565,50 @@ function initContactForm() {
     });
 }
 
+let toastTimer = null;
+
 function showToast(message, type = "success") {
     const toast = document.getElementById('contact-toast');
     if (!toast) return;
 
+    if (toastTimer) clearTimeout(toastTimer);
+
     const icon = type === "success" 
-        ? '<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>' 
-        : '<i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg"></i>';
+        ? '<i class="fa-solid fa-circle-check text-emerald-400 text-lg shrink-0"></i>' 
+        : '<i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg shrink-0"></i>';
 
     toast.innerHTML = `
-        <div class="flex items-center gap-3 glass-card px-5 py-3.5 rounded-2xl border ${type === "success" ? "border-emerald-500/40 bg-slate-900/90 text-slate-100" : "border-rose-500/40 bg-slate-900/90 text-slate-100"} shadow-2xl">
-            ${icon}
-            <span class="text-sm font-medium">${message}</span>
+        <div class="flex items-center justify-between gap-3 glass-card px-5 py-3.5 rounded-2xl border ${type === "success" ? "border-emerald-500/40 bg-slate-900/95 text-slate-100" : "border-rose-500/40 bg-slate-900/95 text-slate-100"} shadow-2xl">
+            <div class="flex items-center gap-3">
+                ${icon}
+                <span class="text-sm font-medium">${message}</span>
+            </div>
+            <button type="button" onclick="hideToast()" aria-label="Close notification" class="text-slate-400 hover:text-white transition-colors p-1 cursor-pointer">
+                <i class="fa-solid fa-xmark text-base"></i>
+            </button>
         </div>
     `;
 
     toast.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
-    toast.classList.add('translate-y-0', 'opacity-100');
+    toast.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
 
-    setTimeout(() => {
-        toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
-        toast.classList.remove('translate-y-0', 'opacity-100');
-    }, 4500);
+    toastTimer = setTimeout(() => {
+        hideToast();
+    }, 5000);
 }
+
+function hideToast() {
+    const toast = document.getElementById('contact-toast');
+    if (!toast) return;
+    toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
+    toast.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+}
+window.hideToast = hideToast;
+
+let lastFocusedElement = null;
 
 /* 14. Modals Controller (Project, Certificate, CV Preview) */
 function initModals() {
-    // Global close listeners
     document.querySelectorAll('.modal-close-btn').forEach(btn => {
         btn.addEventListener('click', closeAllModals);
     });
@@ -605,11 +628,24 @@ function initModals() {
     });
 }
 
+function openModal(modalElement) {
+    if (!modalElement) return;
+    lastFocusedElement = document.activeElement;
+    modalElement.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    const closeBtn = modalElement.querySelector('.modal-close-btn');
+    if (closeBtn) closeBtn.focus();
+}
+
 function closeAllModals() {
     document.querySelectorAll('.modal-overlay').forEach(modal => {
         modal.classList.remove('open');
     });
     document.body.style.overflow = '';
+    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+        lastFocusedElement.focus();
+        lastFocusedElement = null;
+    }
 }
 
 function openProjectModal(projectId) {
@@ -876,8 +912,7 @@ function openProjectModal(projectId) {
         ` : ''}
     `;
 
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    openModal(modal);
 }
 
 function switchProjectModalTab(tab) {
@@ -959,14 +994,12 @@ function openCertModal(certId) {
         </div>
     `;
 
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    openModal(modal);
 }
 
 function openCVModal() {
     const modal = document.getElementById('cv-modal');
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    openModal(modal);
 }
 
 /* 15. Dynamic Year */

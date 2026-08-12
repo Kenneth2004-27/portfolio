@@ -159,7 +159,7 @@ window.portfolioData = {
         {
             year: "2022 - 2026 (Present)",
             title: "Bachelor of Science in Information Technology (BSIT)",
-            institution: "Southwestern University Phin",
+            institution: "Southwestern University Phinma",
             type: "education",
             icon: "fa-graduation-cap",
             description: "Specializing in Network Administration, Systems Security, and Cyber Forensics. Maintaining top academic standing with emphasis on practical lab implementations."

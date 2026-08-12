@@ -65,7 +65,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
             
             <!-- Brand Logo -->
-            <a href="#home" class="flex items-center gap-2 group">
+            <a href="#home" aria-label="Kenneth Aguitong Portfolio Home" class="flex items-center gap-2 group">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-slate-950 font-mono font-bold text-lg shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
                     KA
                 </div>
@@ -94,7 +94,7 @@
             </div>
 
             <!-- Mobile Hamburger Toggle -->
-            <button id="mobile-menu-btn" type="button" class="md:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-cyan-400 focus:outline-none cursor-pointer">
+            <button id="mobile-menu-btn" type="button" aria-label="Toggle Navigation Menu" aria-expanded="false" class="md:hidden p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center">
                 <i class="fa-solid fa-bars-staggered text-2xl"></i>
             </button>
         </div>
@@ -142,7 +142,7 @@
                     </div>
 
                     <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                        Passionate BSIT Student (Class of 2026) dedicated to hardening digital infrastructures, offensive security labs, ethical hacking, and engineering secure web applications connected with Supabase.
+                        Passionate BSIT Student (Class of 2026) dedicated to hardening digital infrastructures, offensive security labs, ethical hacking, and engineering secure web applications.
                     </p>
 
                     <!-- Hero Buttons -->
@@ -160,13 +160,13 @@
 
                     <!-- Social Icons -->
                     <div class="flex items-center justify-center lg:justify-start gap-4 pt-4 text-slate-400">
-                        <a href="https://github.com/KennethAguitong" target="_blank" class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center hover:text-cyan-400 hover:border-cyan-500/40 transition-all">
+                        <a href="https://github.com/KennethAguitong" target="_blank" aria-label="GitHub Profile" class="w-11 h-11 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center hover:text-cyan-400 hover:border-cyan-500/40 transition-all">
                             <i class="fab fa-github text-lg"></i>
                         </a>
-                        <a href="https://www.linkedin.com/in/kenneth-james-aguitong-8a3263274" target="_blank" class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center hover:text-cyan-400 hover:border-cyan-500/40 transition-all">
+                        <a href="https://www.linkedin.com/in/kenneth-james-aguitong-8a3263274" target="_blank" aria-label="LinkedIn Profile" class="w-11 h-11 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center hover:text-cyan-400 hover:border-cyan-500/40 transition-all">
                             <i class="fab fa-linkedin text-lg"></i>
                         </a>
-                        <a href="mailto:kennethaguitong@gmail.com" class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center hover:text-cyan-400 hover:border-cyan-500/40 transition-all">
+                        <a href="mailto:kennethaguitong@gmail.com" aria-label="Send Email" class="w-11 h-11 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center hover:text-cyan-400 hover:border-cyan-500/40 transition-all">
                             <i class="fa-solid fa-envelope text-lg"></i>
                         </a>
                     </div>
@@ -233,7 +233,7 @@
                 
                 <div class="text-center mb-16">
                     <span class="text-xs font-mono uppercase tracking-widest text-cyan-400 font-semibold px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-800/40">
-                        About Kenneth
+                        About 
                     </span>
                     <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-3">Passionate IT Student & Security Enthusiast</h2>
                 </div>
@@ -267,7 +267,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-semibold text-xs text-slate-400 uppercase">Degree</h4>
-                                    <p class="text-sm font-bold text-slate-200">BSIT (Graduation 2026)</p>
+                                    <p class="text-sm font-bold text-slate-200">BSIT Student (2026)</p>
                                 </div>
                             </div>
                         </div>
@@ -295,8 +295,8 @@
                             <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl mb-4">
                                 <i class="fa-solid fa-database"></i>
                             </div>
-                            <h4 class="font-bold text-lg text-slate-100 mb-2">Supabase Backend</h4>
-                            <p class="text-xs text-slate-400 leading-relaxed">Building serverless backends, RLS data privacy policy compliance, edge functions, and real-time email triggers.</p>
+                            <h4 class="font-bold text-lg text-slate-100 mb-2">Secure Cloud Backend</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed">Building secure backends, robust data privacy policies, serverless API integrations, and real-time triggers.</p>
                         </div>
 
                         <div class="glass-card p-6 rounded-3xl border border-slate-800 hover:border-cyan-500/40 transition-all">
@@ -374,8 +374,6 @@
                 <div class="flex flex-wrap items-center justify-center gap-3 mb-12">
                     <button class="project-filter-btn px-5 py-2.5 rounded-full text-xs font-semibold transition-all cursor-pointer bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20" data-filter="all">All Projects</button>
                     <button class="project-filter-btn px-5 py-2.5 rounded-full text-xs font-semibold transition-all cursor-pointer bg-slate-800/60 text-slate-300 hover:text-white" data-filter="webapp">Web Apps</button>
-                    <button class="project-filter-btn px-5 py-2.5 rounded-full text-xs font-semibold transition-all cursor-pointer bg-slate-800/60 text-slate-300 hover:text-white" data-filter="cybersecurity">Cybersecurity</button>
-                    <button class="project-filter-btn px-5 py-2.5 rounded-full text-xs font-semibold transition-all cursor-pointer bg-slate-800/60 text-slate-300 hover:text-white" data-filter="system">Municipal Systems</button>
                 </div>
 
                 <!-- Projects Grid -->
@@ -421,7 +419,7 @@
                                 <i class="fa-solid fa-headset text-cyan-400"></i> Contact Information
                             </h3>
                             <p class="text-slate-400 text-sm leading-relaxed mb-6">
-                                Have a security inquiry, project collaboration, or job opportunity? Send a message through the Supabase connected form or email directly!
+                                Have a security inquiry, project collaboration, or job opportunity? Send a direct message or email me below!
                             </p>
 
                             <div class="space-y-4">
@@ -512,9 +510,9 @@
                 <a href="#contact" class="hover:text-cyan-400 transition-colors">Contact</a>
             </div>
 
-            <div class="flex items-center gap-3 text-cyan-400 font-mono">
-                <i class="fa-solid fa-shield-cat"></i>
-                <span>Secured with Supabase & Vanilla JS</span>
+            <div class="flex items-center gap-3 text-cyan-400 font-mono text-xs">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Built with Modern Security Standards</span>
             </div>
         </div>
     </footer>
@@ -525,9 +523,9 @@
     <!-- Modals Container -->
 
     <!-- Project Details & Interactive Demo Modal -->
-    <div id="project-modal" class="modal-overlay">
+    <div id="project-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Project Details Modal">
         <div class="modal-card max-w-4xl w-full p-6 sm:p-8 relative">
-            <button class="modal-close-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all cursor-pointer">
+            <button class="modal-close-btn absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400" aria-label="Close project modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div id="project-modal-body"></div>
@@ -535,9 +533,9 @@
     </div>
 
     <!-- Certificate Details Modal -->
-    <div id="cert-modal" class="modal-overlay">
+    <div id="cert-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Certificate Details Modal">
         <div class="modal-card max-w-xl w-full p-6 sm:p-8 relative">
-            <button class="modal-close-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all cursor-pointer">
+            <button class="modal-close-btn absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400" aria-label="Close certificate modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div id="cert-modal-body"></div>
@@ -545,9 +543,9 @@
     </div>
 
     <!-- Resume / CV Viewer Modal -->
-    <div id="cv-modal" class="modal-overlay">
+    <div id="cv-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Curriculum Vitae Modal">
         <div class="modal-card max-w-3xl w-full p-6 sm:p-8 relative text-center">
-            <button class="modal-close-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all cursor-pointer">
+            <button class="modal-close-btn absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400" aria-label="Close resume modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             
@@ -590,7 +588,7 @@
     </div>
 
     <!-- Back to top floating button -->
-    <a id="back-to-top" href="#home" class="fixed bottom-6 left-6 z-30 w-11 h-11 rounded-2xl bg-slate-900/90 border border-cyan-500/40 text-cyan-400 flex items-center justify-center shadow-2xl opacity-0 pointer-events-none transition-all duration-300 hover:bg-cyan-500 hover:text-slate-950">
+    <a id="back-to-top" href="#home" aria-label="Scroll back to top" class="fixed bottom-6 left-6 z-30 w-11 h-11 rounded-2xl bg-slate-900/90 border border-cyan-500/40 text-cyan-400 flex items-center justify-center shadow-2xl opacity-0 pointer-events-none transition-all duration-300 hover:bg-cyan-500 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400">
         <i class="fa-solid fa-arrow-up"></i>
     </a>
 
