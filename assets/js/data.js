@@ -5,10 +5,10 @@
 const portfolioData = {
     personal: {
         name: "Kenneth James Aguitong",
-        role: "BSIT Student | Aspiring Cybersecurity Professional",
-        location: "Cebu, Philippines",
+        role: "BSIT Student | Aspiring Cybersecurity Analyst",
+        location: "Dalaguete, Cebu City, Philippines",
         email: "kennethaguitong@gmail.com",
-        phone: "+63 995 842 1092",
+        phone: "+63 9708193654",
         bio: "Passionate Bachelor of Science in Information Technology (BSIT) student (Class of 2026) dedicated to hardening digital infrastructures, network defense, ethical penetration testing, and building secure web applications.",
         passionStatement: "In an increasingly interconnected world, security is not just a feature—it is the foundation of digital trust. My goal is to protect digital assets, proactively identify vulnerabilities, and build resilient network systems.",
         socials: {
@@ -29,21 +29,21 @@ const portfolioData = {
         "Aspiring Cybersecurity Professional",
         "Ethical Hacking Enthusiast",
         "Network Security Practitioner",
-        "Full-Stack Web Developer"
+        "Web Developer"
     ],
     skills: [
         { name: "HTML5", level: 95, category: "frontend", icon: "fab fa-html5", color: "from-orange-500 to-amber-500" },
         { name: "CSS3", level: 90, category: "frontend", icon: "fab fa-css3-alt", color: "from-blue-500 to-cyan-400" },
         { name: "Tailwind CSS", level: 92, category: "frontend", icon: "fa-solid fa-wind", color: "from-cyan-400 to-teal-300" },
-        { name: "JavaScript", level: 88, category: "frontend", icon: "fab fa-js-square", color: "from-yellow-400 to-amber-500" },
-        { name: "React", level: 82, category: "frontend", icon: "fab fa-react", color: "from-cyan-500 to-blue-500" },
+        { name: "JavaScript", level: 85, category: "frontend", icon: "fab fa-js-square", color: "from-yellow-400 to-amber-500" },
+        { name: "Supabase", level: 85, category: "backend", icon: "fa-solid fa-database", color: "from-emerald-400 to-green-500" },
         { name: "Firebase", level: 78, category: "backend", icon: "fa-solid fa-fire", color: "from-amber-500 to-orange-600" },
         { name: "Python", level: 85, category: "backend", icon: "fab fa-python", color: "from-blue-400 to-indigo-500" },
         { name: "Git/GitHub", level: 90, category: "tools", icon: "fab fa-git-alt", color: "from-red-500 to-orange-500" },
         { name: "Networking", level: 88, category: "security", icon: "fa-solid fa-network-wired", color: "from-emerald-400 to-teal-500" },
         { name: "Cybersecurity", level: 85, category: "security", icon: "fa-solid fa-shield-halved", color: "from-cyan-400 to-blue-600" },
         { name: "Penetration Testing", level: 80, category: "security", icon: "fa-solid fa-bug-slash", color: "from-red-400 to-rose-600" },
-        { name: "Linux", level: 86, category: "tools", icon: "fab fa-linux", color: "from-amber-400 to-yellow-600" }
+        { name: "Linux", level: 60, category: "tools", icon: "fab fa-linux", color: "from-amber-400 to-yellow-600" }
     ],
     circularSkills: [
         { name: "Cybersecurity", level: 85, color: "#06b6d4", icon: "fa-shield-halved" },
@@ -121,8 +121,8 @@ const portfolioData = {
             category: "webapp",
             image: "assets/images/project-1.jpg",
             shortDesc: "Centralized Municipal Social Welfare & Development Office (MSWDO) portal with multi-tier access for Staff, Beneficiaries, and Assistance Applicants.",
-            fullDesc: "Designed and developed an end-to-end Digital Information Management System for the Municipal Social Welfare and Development Office (MSWDO). The platform delivers role-based portals for Staff Administrators, Registered Welfare Beneficiaries, and New Program Applicants. Fully compliant with the Data Privacy Act of 2012, it streamlines social welfare assistance tracking across Senior Citizen, PWD, Youth, and Women community sectors.",
-            technologies: ["HTML5", "CSS3", "Tailwind CSS", "JavaScript", "Firebase", "RBAC Security"],
+            fullDesc: "Designed and developed an end-to-end Digital Information Management System for the Municipal Social Welfare and Development Office (MSWDO)in Carmen Cebu. The platform delivers role-based portals for Staff Administrators, Registered Welfare Beneficiaries, and New Program Applicants. Fully compliant with the Data Privacy Act of 2012, it streamlines social welfare assistance tracking across Senior Citizen, PWD, Youth, and Women community sectors.",
+            technologies: ["React", "HTML5", "Supabase"],
             github: "https://github.com/KennethAguitong/digital-information-management-system",
             demo: "https://kennethaguitong.github.io/digital-information-management-system",
             portals: [
@@ -140,14 +140,14 @@ const portfolioData = {
         },
         {
             id: "cresst-glass",
-            title: "CRESST GLASS",
+            title: "CREST GLASS",
             category: "webapp",
             image: "assets/images/project-2.jpg",
             shortDesc: "A modern glassmorphic web application built for institutional data tracking, telemetry monitoring, and interactive analytics.",
             fullDesc: "Engineered CRESST GLASS, a high-performance web application featuring a modern glassmorphism design system. Designed to visualize real-time telemetry metrics, track operational status, and present intuitive dashboard views for administrative decision-making.",
-            technologies: ["JavaScript", "HTML5", "Tailwind CSS", "React", "Python"],
+            technologies: ["Typesccript", "HTML5", "Supabase"],
             github: "https://github.com/KennethAguitong/cresst-glass",
-            demo: "https://kennethaguitong.github.io/cresst-glass",
+            demo: "https://github.com/Kenneth2004-27/web-crest-glass.git",
             highlights: [
                 "Sleek dark theme with frosted glassmorphism visual components.",
                 "Interactive data charts and status monitoring gauges.",
@@ -159,10 +159,10 @@ const portfolioData = {
         {
             year: "2022 - 2026 (Present)",
             title: "Bachelor of Science in Information Technology (BSIT)",
-            institution: "Southwestern University PHINMA",
+            institution: "Southwestern University Phin",
             type: "education",
             icon: "fa-graduation-cap",
-            description: "Specializing in Network Administration, Systems Security, and Software Engineering. Maintaining top academic standing with emphasis on practical lab implementations."
+            description: "Specializing in Network Administration, Systems Security, and Cyber Forensics. Maintaining top academic standing with emphasis on practical lab implementations."
         },
         {
             year: "2026",

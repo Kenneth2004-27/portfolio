@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initContactForm();
     initModals();
     initDynamicYear();
+    setTimeout(animateCounters, 500);
 });
 
 /* 1. Preloader Handler */
@@ -262,6 +263,11 @@ function renderSkills() {
             `;
         }).join('');
     }
+
+    setTimeout(() => {
+        animateSkillBars();
+        animateCircularSkills();
+    }, 300);
 }
 
 function animateSkillBars() {
@@ -427,14 +433,14 @@ function renderTimeline() {
     `).join('');
 }
 
-/* 13. Contact Form Validation & Toast */
+/* 13. Contact Form Validation & Supabase Integration */
 function initContactForm() {
     const form = document.getElementById('contact-form');
     const toast = document.getElementById('contact-toast');
 
     if (!form) return;
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const nameInput = document.getElementById('form-name');
@@ -449,24 +455,24 @@ function initContactForm() {
             if (input) input.classList.remove('border-red-500');
         });
 
-        if (!nameInput.value.trim()) {
-            nameInput.classList.add('border-red-500');
+        if (!nameInput || !nameInput.value.trim()) {
+            if (nameInput) nameInput.classList.add('border-red-500');
             isValid = false;
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailInput.value.trim() || !emailRegex.test(emailInput.value.trim())) {
-            emailInput.classList.add('border-red-500');
+        if (!emailInput || !emailInput.value.trim() || !emailRegex.test(emailInput.value.trim())) {
+            if (emailInput) emailInput.classList.add('border-red-500');
             isValid = false;
         }
 
-        if (!subjectInput.value.trim()) {
-            subjectInput.classList.add('border-red-500');
+        if (!subjectInput || !subjectInput.value.trim()) {
+            if (subjectInput) subjectInput.classList.add('border-red-500');
             isValid = false;
         }
 
-        if (!messageInput.value.trim() || messageInput.value.trim().length < 10) {
-            messageInput.classList.add('border-red-500');
+        if (!messageInput || !messageInput.value.trim() || messageInput.value.trim().length < 10) {
+            if (messageInput) messageInput.classList.add('border-red-500');
             isValid = false;
         }
 
@@ -475,18 +481,41 @@ function initContactForm() {
             return;
         }
 
-        // Simulate successful email dispatch
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalBtnText = submitBtn.innerHTML;
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending...`;
+        submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Transmitting via Supabase...`;
 
-        setTimeout(() => {
-            form.reset();
+        const payload = {
+            name: nameInput.value.trim(),
+            email: emailInput.value.trim(),
+            subject: subjectInput.value.trim(),
+            message: messageInput.value.trim()
+        };
+
+        try {
+            let res;
+            if (typeof window.sendSupabaseContactMessage === 'function') {
+                res = await window.sendSupabaseContactMessage(payload);
+            } else {
+                await new Promise(r => setTimeout(r, 800));
+                res = { success: true, message: "Thank you! Your message has been sent successfully." };
+            }
+
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnText;
-            showToast("Thank you! Your message has been sent successfully. I will get back to you shortly.", "success");
-        }, 1200);
+
+            if (res.success) {
+                form.reset();
+                showToast(res.message, "success");
+            } else {
+                showToast(res.message || "Failed to send message.", "error");
+            }
+        } catch (err) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+            showToast("Error processing message: " + (err.message || "Network error"), "error");
+        }
     });
 }
 
