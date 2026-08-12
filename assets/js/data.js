@@ -2,7 +2,7 @@
  * Data module for Kenneth James Aguitong Portfolio
  */
 
-const portfolioData = {
+window.portfolioData = {
     personal: {
         name: "Kenneth James Aguitong",
         role: "BSIT Student | Aspiring Cybersecurity Analyst",
@@ -198,7 +198,8 @@ const portfolioData = {
         }
     ]
 };
+var portfolioData = window.portfolioData;
 
 if (typeof module !== 'undefined') {
-    module.exports = portfolioData;
+    module.exports = window.portfolioData;
 }

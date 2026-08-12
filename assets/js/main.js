@@ -179,47 +179,67 @@ function initScrollProgress() {
     });
 }
 
+function getPortfolioData() {
+    return window.portfolioData || (typeof portfolioData !== 'undefined' ? portfolioData : null);
+}
+
 /* 7. Scroll Reveal & Skill Progress Trigger */
 function initScrollReveal() {
     const observerOptions = {
         root: null,
-        rootMargin: '0px',
-        threshold: 0.15
+        rootMargin: '50px',
+        threshold: 0.05
     };
 
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-                
-                // Trigger Skill Bar Fill if this element is a skill container
-                if (entry.target.id === 'skills-container') {
-                    animateSkillBars();
-                    animateCircularSkills();
-                }
-                
-                // Trigger Counter stats animation
-                if (entry.target.id === 'stats-container') {
-                    animateCounters();
-                }
+    if ('IntersectionObserver' in window) {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    
+                    if (entry.target.id === 'skills-container') {
+                        animateSkillBars();
+                        animateCircularSkills();
+                    }
+                    
+                    if (entry.target.id === 'stats-container') {
+                        animateCounters();
+                    }
 
-                observer.unobserve(entry.target);
-            }
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right, #skills-container, #stats-container').forEach(el => {
+            revealObserver.observe(el);
         });
-    }, observerOptions);
+    }
 
-    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, #skills-container, #stats-container').forEach(el => {
-        revealObserver.observe(el);
-    });
+    // Safety fallback: Ensure all sections are active and visible after 1 second
+    setTimeout(() => {
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right, #skills-container, #stats-container').forEach(el => {
+            el.classList.add('active');
+        });
+        animateSkillBars();
+        animateCircularSkills();
+        animateCounters();
+    }, 1000);
 }
 
 /* 8. Render Skills Section & Progress Bars */
 function renderSkills() {
     const skillList = document.getElementById('linear-skills-list');
     const circularList = document.getElementById('circular-skills-list');
+    const data = getPortfolioData();
 
-    if (skillList && portfolioData.skills) {
-        skillList.innerHTML = portfolioData.skills.map(skill => `
+    if (!data) {
+        setTimeout(renderSkills, 100);
+        return;
+    }
+
+    if (skillList && data.skills) {
+        skillList.innerHTML = data.skills.map(skill => `
             <div class="glass-card p-4 rounded-2xl">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center gap-3">
@@ -237,8 +257,8 @@ function renderSkills() {
         `).join('');
     }
 
-    if (circularList && portfolioData.circularSkills) {
-        circularList.innerHTML = portfolioData.circularSkills.map(cSkill => {
+    if (circularList && data.circularSkills) {
+        circularList.innerHTML = data.circularSkills.map(cSkill => {
             const radius = 38;
             const circumference = 2 * Math.PI * radius;
             return `
@@ -310,9 +330,16 @@ function animateCounters() {
 /* 10. Certifications Render & Viewer */
 function renderCertifications() {
     const container = document.getElementById('certifications-grid');
-    if (!container || !portfolioData.certifications) return;
+    const data = getPortfolioData();
 
-    container.innerHTML = portfolioData.certifications.map(cert => `
+    if (!data) {
+        setTimeout(renderCertifications, 100);
+        return;
+    }
+
+    if (!container || !data.certifications) return;
+
+    container.innerHTML = data.certifications.map(cert => `
         <div class="glass-card p-6 rounded-3xl relative overflow-hidden group cursor-pointer border border-slate-800 hover:border-cyan-500/50" onclick="openCertModal('${cert.id}')">
             <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-cyan-500/10 rounded-full blur-xl group-hover:bg-cyan-500/20 transition-all"></div>
             <div class="flex items-start gap-4 mb-4">
@@ -338,8 +365,14 @@ function renderCertifications() {
 function renderProjects(filterCategory = 'all') {
     const grid = document.getElementById('projects-grid');
     const filterBtns = document.querySelectorAll('.project-filter-btn');
+    const data = getPortfolioData();
 
-    if (!grid || !portfolioData.projects) return;
+    if (!data) {
+        setTimeout(() => renderProjects(filterCategory), 100);
+        return;
+    }
+
+    if (!grid || !data.projects) return;
 
     // Update active filter button state
     filterBtns.forEach(btn => {
@@ -354,8 +387,8 @@ function renderProjects(filterCategory = 'all') {
     });
 
     const filtered = filterCategory === 'all'
-        ? portfolioData.projects
-        : portfolioData.projects.filter(p => p.category === filterCategory);
+        ? data.projects
+        : data.projects.filter(p => p.category === filterCategory);
 
     grid.innerHTML = filtered.map(p => `
         <div class="glass-card rounded-3xl overflow-hidden group flex flex-col h-full border border-slate-800 hover:border-cyan-500/40">
@@ -405,7 +438,14 @@ document.addEventListener('click', (e) => {
 /* 12. Vertical Timeline Render */
 function renderTimeline() {
     const container = document.getElementById('timeline-container');
-    if (!container || !portfolioData.timeline) return;
+    const data = getPortfolioData();
+
+    if (!data) {
+        setTimeout(renderTimeline, 100);
+        return;
+    }
+
+    if (!container || !data.timeline) return;
 
     container.innerHTML = portfolioData.timeline.map((item, index) => `
         <div class="relative pl-8 md:pl-0 mb-10 group">
@@ -573,7 +613,9 @@ function closeAllModals() {
 }
 
 function openProjectModal(projectId) {
-    const p = portfolioData.projects.find(item => item.id === projectId);
+    const data = getPortfolioData();
+    if (!data || !data.projects) return;
+    const p = data.projects.find(item => item.id === projectId);
     if (!p) return;
 
     const modal = document.getElementById('project-modal');
@@ -876,7 +918,9 @@ function simulatePortalAction(portalName) {
 }
 
 function openCertModal(certId) {
-    const c = portfolioData.certifications.find(item => item.id === certId);
+    const data = getPortfolioData();
+    if (!data || !data.certifications) return;
+    const c = data.certifications.find(item => item.id === certId);
     if (!c) return;
 
     const modal = document.getElementById('cert-modal');
