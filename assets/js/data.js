@@ -157,7 +157,7 @@ window.portfolioData = {
     ],
     timeline: [
         {
-            year: "2022 - 2026 (Present)",
+            year: "2023 - 2026 (Present)",
             title: "Bachelor of Science in Information Technology (BSIT)",
             institution: "Southwestern University Phinma",
             type: "education",
